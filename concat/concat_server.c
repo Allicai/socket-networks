@@ -38,24 +38,25 @@ void server(int port) {
     int sockfd, new_sockfd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t clilen;
-    char buffer[21]; // the max length of received data (20 + 1 for null terminator)
+    char buffer[11]; // Buffer for received data from the client
+    char random_str[11]; // Buffer for random string
+    char concatenated_str[21]; // Buffer for concatenated string
 
-    // creating socket
+    // Create socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         perror("Error creating socket");
         exit(1);
     }
 
-    // initializing sock struct
+    // Initialize sockaddr structure
     init_sockaddr((struct sockaddr*)&server_addr, NULL, port);
 
-    // binding a socket to a addr
+    // Bind socket to address
     if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         perror("Error binding socket");
         exit(1);
     }
-
     // listen for connection
     listen(sockfd, 5);
 
@@ -96,22 +97,25 @@ void server(int port) {
                 break;
             }
 
+            // Null-terminate received data
             buffer[bytes_received] = '\0';
 
-            // generating a random string
-            rand_str(buffer + bytes_received, 10);
+            // Generate random string
+            rand_str(random_str, sizeof(random_str) - 1);
 
-            // sending data to the client
-            if (send(new_sockfd, buffer, bytes_received + 10, 0) < 0) {
+            // Concatenate received data and random string
+            snprintf(concatenated_str, sizeof(concatenated_str), "%s%s", buffer, random_str);
+
+            // Send concatenated string back to client
+            if (send(new_sockfd, concatenated_str, strlen(concatenated_str), 0) < 0) {
                 perror("Error sending data to client");
                 exit(1);
             }
         }
 
-        // closing client socket
+        // Close client socket
         close(new_sockfd);
     }
-
     // TODO: close all sockets that were created
     close(sockfd);
 
