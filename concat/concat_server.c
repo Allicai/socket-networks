@@ -87,7 +87,7 @@ void server(int port) {
 
         while (1) {
             // getting data from client
-            int bytes_received = recv(new_sockfd, buffer, sizeof(buffer), 0);
+            int bytes_received = recv(new_sockfd, buffer, sizeof(buffer) - 1, 0);
             if (bytes_received < 0) {
                 perror("Error receiving data from client");
                 exit(1);
@@ -95,6 +95,8 @@ void server(int port) {
                 // client closes 
                 break;
             }
+
+            buffer[bytes_received] = '\0';
 
             // generating a random string
             rand_str(buffer + bytes_received, 10);
