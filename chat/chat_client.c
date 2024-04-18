@@ -24,6 +24,26 @@ void client(char *ip, int port) {
      *  - When encountering errors, print errors using "perror" and quit
      */
     /* TODO: your code here */
+    int sockfd;
+    struct sockaddr_in server_addr;
+
+    // creating socket
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        perror("Error creating socket");
+        exit(1);
+    }
+
+    // creating sockaddr struct
+    init_sockaddr((struct sockaddr*)&server_addr, ip, port);
+
+    // connect to server
+    if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Error connecting to server");
+        exit(1);
+    }
+
+    char buffer[256]; // user input
 
 
     // Repeat until server goes down or user stops entering in data
@@ -36,7 +56,33 @@ void client(char *ip, int port) {
          */
 
         /* TODO: your code here */
+        fd_set readfds;
+        FD_ZERO(&readfds);
+        FD_SET(sockfd, &readfds);
+        FD_SET(STDIN_FILENO, &readfds);
 
+        int maxfd = (sockfd > STDIN_FILENO) ? sockfd : STDIN_FILENO;
+        select(maxfd + 1, &readfds, NULL, NULL, NULL);
+
+        // If socket has data, receive and print message
+        if (FD_ISSET(sockfd, &readfds)) {
+            int bytes_received = recv(sockfd, buffer, sizeof(buffer), 0);
+            if (bytes_received <= 0) {
+                perror("Error receiving data from server");
+                exit(1);
+            }
+            buffer[bytes_received] = '\0';
+            print_msg(buffer);
+        }
+
+        // If stdin has data, send message to server
+        if (FD_ISSET(STDIN_FILENO, &readfds)) {
+            fgets(buffer, sizeof(buffer), stdin);
+            if (send(sockfd, buffer, strlen(buffer), 0) < 0) {
+                perror("Error sending data to server");
+                exit(1);
+            }
+        }
 
     }
 }
