@@ -55,7 +55,7 @@ void client(char *ip, int port) {
         exit(1);
     }
 
-    char buffer[21];
+    char buffer[11]; 
 
 
     for (int i=0; i<NUM_TRANSMISSIONS; i++) {
@@ -70,7 +70,7 @@ void client(char *ip, int port) {
          */
         /* TODO: your code here */
         // generating a random string
-        rand_str(buffer, 20);
+        rand_str(buffer, 10);
 
         // sending data to server
         if (send(sockfd, buffer, strlen(buffer), 0) < 0) {
@@ -85,7 +85,7 @@ void client(char *ip, int port) {
         }
 
         // null termination for received data
-        buffer[20] = '\0';
+        buffer[10] = '\0';
 
         // print the data
         print_msg(buffer);
