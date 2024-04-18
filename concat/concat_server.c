@@ -35,7 +35,29 @@ void server(int port) {
      * */
 
     /* TODO: your code here */
+    int sockfd, new_sockfd;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t clilen;
+    char buffer[21]; // the max length of received data (20 + 1 for null terminator)
 
+    // creating socket
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        perror("Error creating socket");
+        exit(1);
+    }
+
+    // initializing sock struct
+    init_sockaddr((struct sockaddr*)&server_addr, NULL, port);
+
+    // binding a socket to a addr
+    if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Error binding socket");
+        exit(1);
+    }
+
+    // listen for connection
+    listen(sockfd, 5);
 
 
     while(1) {
@@ -54,10 +76,42 @@ void server(int port) {
          */
 
         /* TODO: your code here */
+        clilen = sizeof(client_addr);
 
+        // accept client connection
+        new_sockfd = accept(sockfd, (struct sockaddr *)&client_addr, &clilen);
+        if (new_sockfd < 0) {
+            perror("Error accepting connection");
+            exit(1);
+        }
+
+        while (1) {
+            // getting data from client
+            int bytes_received = recv(new_sockfd, buffer, sizeof(buffer), 0);
+            if (bytes_received < 0) {
+                perror("Error receiving data from client");
+                exit(1);
+            } else if (bytes_received == 0) {
+                // client closes 
+                break;
+            }
+
+            // generating a random string
+            rand_str(buffer + bytes_received, 10);
+
+            // sending data to the client
+            if (send(new_sockfd, buffer, bytes_received + 10, 0) < 0) {
+                perror("Error sending data to client");
+                exit(1);
+            }
+        }
+
+        // closing client socket
+        close(new_sockfd);
     }
 
     // TODO: close all sockets that were created
+    close(sockfd);
 
 }
 

@@ -36,6 +36,26 @@ void client(char *ip, int port) {
      */
 
     /* TODO: your code here */
+    int sockfd;
+    struct sockaddr_in server_addr;
+
+    // creating socket
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        perror("Error creating socket");
+        exit(1);
+    }
+
+    // creating sockaddr struct
+    init_sockaddr((struct sockaddr*)&server_addr, ip, port);
+
+    // connect to remote server
+    if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Error connecting to server");
+        exit(1);
+    }
+
+    char buffer[11];
 
 
     for (int i=0; i<NUM_TRANSMISSIONS; i++) {
@@ -49,10 +69,30 @@ void client(char *ip, int port) {
          *  - When encountering errors, print errors using "perror" and quit
          */
         /* TODO: your code here */
+        // generating a random string
+        rand_str(buffer, 10);
 
+        // sending data to server
+        if (send(sockfd, buffer, strlen(buffer), 0) < 0) {
+            perror("Error sending data to server");
+            exit(1);
+        }
+
+        // receiving data from server
+        if (recv(sockfd, buffer, sizeof(buffer), 0) < 0) {
+            perror("Error receiving data from server");
+            exit(1);
+        }
+
+        // null termination for received data
+        buffer[10] = '\0';
+
+        // print the data
+        print_msg(buffer);
     }
 
     // TODO: close socket
+    close(sockfd);
 }
 
 int main(int argc, char *argv[]) {
