@@ -38,21 +38,21 @@ void server(int port) {
     int sockfd, new_sockfd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t clilen;
-    char buffer[11]; // Buffer for received data from the client
-    char random_str[11]; // Buffer for random string
-    char concatenated_str[21]; // Buffer for concatenated string
+    char buffer[11]; // buffer for data from the client
+    char random_str[11]; // buffer for random string
+    char concatenated_str[21]; // buffer for concatenated string
 
-    // Create socket
+    // create socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         perror("Error creating socket");
         exit(1);
     }
 
-    // Initialize sockaddr structure
+    // create sockaddr structure
     init_sockaddr((struct sockaddr*)&server_addr, NULL, port);
 
-    // Bind socket to address
+    // bind sock to addr
     if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         perror("Error binding socket");
         exit(1);
@@ -97,13 +97,13 @@ void server(int port) {
                 break;
             }
 
-            // Null-terminate received data
+            // null-terminate received data
             buffer[bytes_received] = '\0';
 
-            // Generate random string
+            // making a random string
             rand_str(random_str, sizeof(random_str) - 1);
 
-            // Concatenate received data and random string
+            // concating received data and random string
             snprintf(concatenated_str, sizeof(concatenated_str), "%s%s", buffer, random_str);
 
             // Send concatenated string back to client
@@ -113,7 +113,7 @@ void server(int port) {
             }
         }
 
-        // Close client socket
+        // closing the client socket
         close(new_sockfd);
     }
     // TODO: close all sockets that were created
