@@ -1,14 +1,13 @@
-Name:
-NUID:
-slack hours used: 0
-remaining slack hours: 0
+Name: Vinit Patel
+NUID: 002181048
+slack hours used: 107
+slack hours remaining: 13
 
 ---
 
-Collaborators (who you talked to about the lab, what you talked about):
+Collaborators:
+N/A
 
+Source material:
 
-Source material that you consulted:
-
-
-Other acknowledgments:
+Other acknowledgements:
